@@ -81,7 +81,7 @@ export default function Contact() {
       {/* Floating Phone Icon */}
       <motion.div
         className="fixed bottom-6 right-6 bg-[#8F501B] p-5 rounded-full shadow-lg cursor-pointer hover:bg-[#7a3f17] transition-all"
-        onClick={() => window.open('tel:+919876543210')}
+        onClick={() => window.open('tel:+917200212121')}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1, duration: 0.6, type: 'spring' }}
