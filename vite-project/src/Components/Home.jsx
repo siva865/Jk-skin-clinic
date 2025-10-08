@@ -1,14 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import bgImage from "../assets/Images/bg.jpeg"; // Background image
 
 export default function Home() {
-  // Scroll handler
-  const handleScrollToTreatments = () => {
-    const section = document.getElementById("treatments");
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
+  const navigate = useNavigate();
+
+  // Navigate handler
+  const handleNavigateToTreatments = () => {
+    navigate("/treatments"); // Navigate to Treatments page
   };
 
   return (
@@ -69,7 +69,7 @@ export default function Home() {
           </motion.p>
 
           <motion.button
-            onClick={handleScrollToTreatments}
+            onClick={handleNavigateToTreatments}
             className="mt-4 bg-[#FFD6A5] text-[#622619] px-6 py-3 rounded-full font-semibold hover:bg-white transition-all duration-300 shadow-md"
             whileHover={{ scale: 1.05 }}
           >
