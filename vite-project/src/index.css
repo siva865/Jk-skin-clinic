@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+body {
+ 
+  font-family: 'Poppins', sans-serif;
+}
+
+.accent-beige{
+  background: linear-gradient(135deg, #F6D3A6 0%, #ffffff 100%);
+}
