@@ -1,0 +1,69 @@
+# ==============================
+# Logs
+# ==============================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==============================
+# Node modules & build
+# ==============================
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# ==============================
+# Environment & sensitive data
+# ==============================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# ==============================
+# Editor directories and files
+# ==============================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ==============================
+# Optional npm/Yarn/Pnpm files
+# ==============================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ==============================
+# OS generated files
+# ==============================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==============================
+# Test / Coverage
+# ==============================
+coverage/
+.nyc_output/
+
+# ==============================
+# Frontend frameworks (React/Vite/Next)
+# ==============================
+*.log
+*.cache
+.next/
+out/
