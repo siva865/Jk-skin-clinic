@@ -14,7 +14,7 @@ import img9 from "../assets/Images/nine.jpeg";
 import img10 from "../assets/Images/ten.jpeg";
 import img11 from "../assets/Images/leven.jpeg";
 import img12 from "../assets/Images/twel.jpeg";
-import img13 from "../assets/Images/Thirteen.jpeg";
+import img13 from "../assets/Images/thirteen.jpeg";
 import img14 from "../assets/Images/fourteen.jpeg";
 import img15 from "../assets/Images/fifteen.jpeg";
 
