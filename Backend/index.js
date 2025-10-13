@@ -234,6 +234,7 @@ app.delete("/api/announcements/:id", async (req, res) => {
 });
 
 // ------------------ PHOTO ROUTES ------------------
+// ✅ GET all photos
 app.get("/api/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
@@ -243,35 +244,37 @@ app.get("/api/photos", async (req, res) => {
   }
 });
 
-app.post("/api/photos", upload.single("image"), async (req, res) => {
+// ✅ POST a new photo (Cloudinary URL comes from frontend)
+app.post("/api/photos", async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ msg: "No image uploaded" });
+    const { image, title } = req.body;
 
-    const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/photos" });
-    try { fs.unlinkSync(req.file.path); } catch (e) {}
+    if (!image) {
+      return res.status(400).json({ msg: "No image URL provided" });
+    }
 
     const newPhoto = await Photo.create({
-      title: req.body.title || "Untitled",
-      image: result.secure_url,
+      title: title || "Untitled",
+      image,
     });
+
     res.json(newPhoto);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put("/api/photos/:id", upload.single("image"), async (req, res) => {
+// ✅ UPDATE photo (replace URL or title)
+app.put("/api/photos/:id", async (req, res) => {
   try {
+    const { image, title } = req.body;
+
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/photos" });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
-      photo.image = result.secure_url;
-    }
+    if (image) photo.image = image;
+    if (title) photo.title = title;
 
-    photo.title = req.body.title || photo.title;
     await photo.save();
     res.json(photo);
   } catch (err) {
@@ -279,10 +282,12 @@ app.put("/api/photos/:id", upload.single("image"), async (req, res) => {
   }
 });
 
+// ✅ DELETE photo
 app.delete("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
+
     res.json({ msg: "Photo deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
