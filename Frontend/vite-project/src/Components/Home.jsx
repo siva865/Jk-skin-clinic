@@ -10,10 +10,6 @@ export default function Home() {
   const [announcement, setAnnouncement] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  const handleNavigateToTreatments = () => {
-    navigate("/treatments");
-  };
-
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
@@ -30,6 +26,10 @@ export default function Home() {
     fetchAnnouncement();
   }, []);
 
+  const handleCallNow = () => {
+    window.location.href = "tel:+917200212121";
+  };
+
   return (
     <section
       className="min-h-[90vh] flex flex-col justify-center items-center text-center px-6 relative"
@@ -39,9 +39,6 @@ export default function Home() {
         backgroundPosition: "center",
       }}
     >
-   
-    
-
       {/* Announcement Popup */}
       <AnnouncementPopup
         text={announcement}
@@ -55,7 +52,7 @@ export default function Home() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        {/* Left */}
+        {/* Left: Heading and Intro */}
         <motion.div
           className="flex-1 text-left md:text-left"
           initial={{ opacity: 0, y: -40 }}
@@ -93,43 +90,61 @@ export default function Home() {
           </motion.p>
 
           <motion.button
-            onClick={handleNavigateToTreatments}
+            onClick={handleCallNow}
             className="mt-4 bg-white text-[#0A4833] px-6 py-3 rounded-full font-semibold hover:bg-[#0A4833] hover:text-white transition-all duration-300 shadow-md"
             whileHover={{ scale: 1.05 }}
           >
-            Explore Treatments
+            📞 Book Now
           </motion.button>
         </motion.div>
 
-        {/* Right: Tips */}
+        {/* Right: Why Choose Us & Core Values */}
         <motion.div
           className="flex-1 flex flex-col md:flex-row gap-y-6 md:gap-x-6 pb-0"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
         >
+          {/* Why Choose Us */}
           <div className="bg-white p-6 rounded-2xl shadow-md text-[#0A4833] w-full md:w-1/2">
-            <h2 className="text-2xl font-semibold mb-2 border-b border-[#0A4833]/30 pb-2">
-              Skin Care Tips
+            <h2 className="text-2xl font-semibold mb-3 border-b border-[#0A4833]/30 pb-2">
+              Why Choose Us
             </h2>
-            <p className="text-sm md:text-base leading-relaxed">
-              Glowing skin begins with proper hydration, balanced nutrition, and
-              professional care. Cleanse daily, moisturize well, and shield your
-              skin from UV damage. Let <strong>JK Skin Clinic</strong> guide you
-              toward healthy, youthful skin.
-            </p>
+            <ul className="list-disc pl-5 space-y-2 text-sm md:text-base leading-relaxed">
+              <li>
+                🌿 <strong>Experienced Specialists:</strong> Our dermatologists
+                deliver safe, effective, and tailored treatments.
+              </li>
+              <li>
+                💎 <strong>Advanced Technology:</strong> We use the latest
+                machines and science-backed techniques.
+              </li>
+              <li>
+                🕊️ <strong>Trusted Care:</strong> A clinic where expertise meets
+                compassion for lasting results.
+              </li>
+            </ul>
           </div>
 
+          {/* Our Core Values */}
           <div className="bg-white p-6 rounded-2xl shadow-md text-[#0A4833] w-full md:w-1/2">
-            <h2 className="text-2xl font-semibold mb-2 border-b border-[#0A4833]/30 pb-2">
-              Hair Care Tips
+            <h2 className="text-2xl font-semibold mb-3 border-b border-[#0A4833]/30 pb-2">
+              Our Core Values
             </h2>
-            <p className="text-sm md:text-base leading-relaxed">
-              Healthy hair thrives with gentle care and nourishment. Avoid harsh
-              chemicals, trim regularly, and choose products suited for your
-              scalp. Our experts at <strong>JK Skin Clinic</strong> help you
-              maintain lustrous, strong hair.
-            </p>
+            <ul className="list-disc pl-5 space-y-2 text-sm md:text-base leading-relaxed">
+              <li>
+                💖 <strong>Integrity:</strong> We believe in transparent care
+                and honest guidance.
+              </li>
+              <li>
+                ✨ <strong>Excellence:</strong> Delivering the highest standard
+                of clinical and aesthetic expertise.
+              </li>
+              <li>
+                🤝 <strong>Compassion:</strong> Every treatment begins with
+                empathy and trust.
+              </li>
+            </ul>
           </div>
         </motion.div>
       </motion.div>

@@ -39,7 +39,9 @@ export default function About() {
             style={{ fontSize: "clamp(1.3rem, 4vw, 2.2rem)" }}
           >
             Dr.&nbsp;
-            <span className="text-[#0A4833] underline decoration-2">Vasantha&nbsp;Manju</span>
+            <span className="text-[#0A4833] underline decoration-2">
+              Vasantha&nbsp;Manju
+            </span>
           </h2>
 
           {/* Experience */}
@@ -61,8 +63,8 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="font-semibold text-[#0A4833]">Dr. Vasantha Manju</span> is a renowned
-            dermatologist and the founder of{" "}
+            <span className="font-semibold text-[#0A4833]">Dr. Vasantha Manju</span> is a
+            renowned dermatologist and the founder of{" "}
             <span className="font-semibold text-[#0A4833]">JK Skin Clinic</span> in Bhavani.
             She is well known for her clinical expertise, compassionate approach, and
             commitment to providing the highest quality of dermatological care.
@@ -109,14 +111,19 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-2">
+            <h3 className="text-2xl font-semibold text-[#0A4833] mb-3">
               Honours & Presentations
             </h3>
-            <p className="text-[#0A4833] leading-relaxed">
-              She has been invited as a speaker for various CMEs and conferences, delivering
-              talks on topics such as Diet in Dermatology, Role of Moisturisers, Urticaria
-              Management, and Itch in Dermatology.
+            <p className="text-[#0A4833] mb-3 leading-relaxed">
+              She has been invited to various CMEs as a speaker to address the crowd on topics like:
             </p>
+            <ul className="list-decimal ml-6 text-[#0A4833] leading-relaxed space-y-1">
+              <li>Diet in Dermatology</li>
+              <li>Role of Moisturisers</li>
+              <li>Urticaria Management</li>
+              <li>Itch in Dermatology</li>
+              <li>Atopy Management</li>
+            </ul>
           </motion.div>
 
           {/* Special Interest */}
@@ -147,7 +154,8 @@ export default function About() {
             <ul className="list-disc ml-6 text-[#0A4833] leading-relaxed space-y-1">
               <li>Member of Tamilnadu Medical Council.</li>
               <li>
-                Life member of the Indian Association of Dermatology, Venereology and Leprosy.
+                Life member of the Indian Association of Dermatology, Venereology and
+                Leprosy.
               </li>
               <li>
                 Life member of the Indian Association of Sexually Transmitted Diseases.
