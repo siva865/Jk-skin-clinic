@@ -15,7 +15,7 @@ export default function Testimonials() {
 
   const fetchVideos = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/videos");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/videos");
       setVideos(res.data);
     } catch (err) {
       console.error("Error fetching videos:", err);
@@ -33,13 +33,13 @@ export default function Testimonials() {
     try {
       if (editingId) {
         await axios.put(
-          `http://localhost:5000/api/videos/${editingId}`,
+          `https://jk-skin-clinic.onrender.com/api/videos/${editingId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          "http://localhost:5000/api/videos",
+          "https://jk-skin-clinic.onrender.com/api/videos",
           formData,
           { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } }
         );
@@ -59,7 +59,7 @@ export default function Testimonials() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/videos/${id}`, {
+      await axios.delete(`https://jk-skin-clinic.onrender.com/api/videos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchVideos();

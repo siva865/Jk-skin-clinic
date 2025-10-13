@@ -13,7 +13,7 @@ export default function Home() {
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/announcements");
+        const res = await axios.get("https://jk-skin-clinic.onrender.com/api/announcements");
         if (res.data && res.data.length > 0) {
           const latest = res.data[res.data.length - 1];
           setAnnouncement(latest.content);

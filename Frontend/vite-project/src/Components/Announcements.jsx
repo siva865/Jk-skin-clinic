@@ -10,7 +10,7 @@ export default function Announcements() {
   const fetchAnnouncements = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/announcements");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/announcements");
       setAnnouncements(res.data);
     } catch (err) {
       console.error(err);
@@ -30,7 +30,7 @@ export default function Announcements() {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/announcements", {
+      await axios.post("https://jk-skin-clinic.onrender.com/api/announcements", {
         content: text,
       });
       setText("");
@@ -48,7 +48,7 @@ export default function Announcements() {
     if (!window.confirm("Delete this announcement?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/announcements/${id}`);
+      await axios.delete(`https://jk-skin-clinic.onrender.com/api/announcements/${id}`);
       fetchAnnouncements();
     } catch (err) {
       console.error(err);

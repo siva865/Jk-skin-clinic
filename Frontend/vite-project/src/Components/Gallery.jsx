@@ -18,7 +18,7 @@ export default function Gallery() {
 
   const fetchPhotos = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/photos");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/photos");
       setPhotos(res.data);
     } catch (err) {
       console.error(err);
@@ -60,12 +60,12 @@ export default function Gallery() {
 
       if (editingId) {
         await axios.put(
-          `http://localhost:5000/api/photos/${editingId}`,
+          `https://jk-skin-clinic.onrender.com/api/photos/${editingId}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        await axios.post("http://localhost:5000/api/photos", payload, {
+        await axios.post("https://jk-skin-clinic.onrender.com/api/photos", payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -86,7 +86,7 @@ export default function Gallery() {
   const handleDelete = async (photo) => {
     if (!window.confirm("Delete this photo?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/photos/${photo._id}`, {
+      await axios.delete(`https://jk-skin-clinic.onrender.com/api/photos/${photo._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPhotos();

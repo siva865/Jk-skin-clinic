@@ -16,7 +16,7 @@ export default function Blogs() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/blogs");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/blogs");
       setBlogs(res.data);
     } catch (err) {
       console.error(err);
@@ -33,7 +33,7 @@ export default function Blogs() {
     if (!title.trim() || !content.trim()) return alert("Enter title & content");
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/blogs", { title, content }, {
+      await axios.post("https://jk-skin-clinic.onrender.com/api/blogs", { title, content }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTitle(""); setContent(""); fetchBlogs();
@@ -45,7 +45,7 @@ export default function Blogs() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this blog?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`, {
+      await axios.delete(`https://jk-skin-clinic.onrender.com/api/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchBlogs();
