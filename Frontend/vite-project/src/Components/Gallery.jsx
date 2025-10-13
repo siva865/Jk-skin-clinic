@@ -8,15 +8,14 @@ export default function Gallery() {
   const [editingId, setEditingId] = useState(null);
   const token = localStorage.getItem("token");
 
-  // ✅ Cloudinary config (use your unsigned preset name)
+  // Cloudinary config
   const CLOUD_NAME = "dmptpis3d";
-  const UPLOAD_PRESET = "jkclinic_unsigned"; // make sure this preset exists
+  const UPLOAD_PRESET = "jkclinic_unsigned"; // Must exist in Cloudinary as unsigned
 
   useEffect(() => {
     fetchPhotos();
   }, []);
 
-  // 🟢 Fetch photos from backend
   const fetchPhotos = async () => {
     try {
       const res = await axios.get("https://jk-skin-clinic.onrender.com/api/photos");
@@ -27,23 +26,18 @@ export default function Gallery() {
     }
   };
 
-  // 🟢 Upload photo to Cloudinary
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
 
+    // Debug FormData
+    // for (let pair of formData.entries()) { console.log(pair[0], pair[1]); }
+
     try {
       const res = await axios.post(
         `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (p) => {
-            const percent = Math.round((p.loaded * 100) / p.total);
-            console.log(`Upload: ${percent}%`);
-          },
-        }
+        formData
       );
       return res.data.secure_url;
     } catch (err) {
@@ -52,7 +46,6 @@ export default function Gallery() {
     }
   };
 
-  // 🟢 Upload button handler
   const handleUpload = async () => {
     if (!file) return alert("Select a photo first");
     setLoading(true);
@@ -84,10 +77,7 @@ export default function Gallery() {
     }
   };
 
-  // 🟢 Edit handler
   const handleEdit = (photo) => setEditingId(photo._id);
-
-  // 🟢 Delete handler
   const handleDelete = async (photo) => {
     if (!window.confirm("Delete this photo?")) return;
     try {
@@ -103,7 +93,6 @@ export default function Gallery() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto bg-[#FEFEFE] rounded-lg shadow-md">
-      {/* 🔼 Upload Section (visible only if logged in) */}
       {token && (
         <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <input
@@ -126,26 +115,12 @@ export default function Gallery() {
         </div>
       )}
 
-      {/* 🖼️ Gallery Section */}
-      <div
-        className="
-          grid 
-          grid-cols-1 
-          sm:grid-cols-2 
-          md:grid-cols-3 
-          lg:grid-cols-4 
-          gap-4 
-          w-full
-        "
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {photos.map((photo) => (
-          <div
-            key={photo._id}
-            className="relative border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE] hover:shadow-lg transition-shadow"
-          >
+          <div key={photo._id} className="relative border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]">
             <img
               src={photo.image}
-              alt="Gallery"
+              alt={photo.title || "Gallery"}
               className="w-full h-72 object-cover transition-transform duration-500 hover:scale-105"
             />
             {token && (
@@ -168,7 +143,6 @@ export default function Gallery() {
         ))}
       </div>
 
-      {/* If no photos */}
       {photos.length === 0 && (
         <p className="text-center text-[#0A4833] mt-8 text-lg font-medium">
           No photos available.
