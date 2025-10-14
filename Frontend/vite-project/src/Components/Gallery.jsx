@@ -7,7 +7,6 @@ export default function Gallery() {
   const [loading, setLoading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
   const [editingId, setEditingId] = useState(null);
-  const [title, setTitle] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -24,26 +23,18 @@ export default function Gallery() {
     }
   };
 
-  // Upload file to Cloudinary via backend
   const uploadToBackend = async (file) => {
     const formData = new FormData();
-    formData.append("photo", file); // must match backend
-
+    formData.append("photo", file);
     const res = await axios.post(
       "https://jk-skin-clinic.onrender.com/api/upload-photo",
       formData,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (e) => {
-          setUploadPercent(Math.round((e.loaded * 100) / e.total));
-        },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+        onUploadProgress: (e) => setUploadPercent(Math.round((e.loaded * 100) / e.total)),
       }
     );
-
-    return res.data.url; // Cloudinary URL
+    return res.data.url;
   };
 
   const handleUpload = async () => {
@@ -52,30 +43,14 @@ export default function Gallery() {
     setUploadPercent(0);
 
     try {
-      let cloudUrl = editingId ? null : await uploadToBackend(file);
-
-      // If editing and new file selected, upload it
-      if (editingId && file) cloudUrl = await uploadToBackend(file);
-
-      const payload = { image: cloudUrl, title };
-
-      if (editingId) {
-        await axios.put(
-          `https://jk-skin-clinic.onrender.com/api/photos/${editingId}`,
-          payload,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } else {
-        await axios.post(
-          "https://jk-skin-clinic.onrender.com/api/photos",
-          payload,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+      const cloudUrl = await uploadToBackend(file);
+      await axios.post(
+        "https://jk-skin-clinic.onrender.com/api/photos",
+        { image: cloudUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setFile(null);
-      setTitle("");
-      setEditingId(null);
       fetchPhotos();
     } catch (err) {
       console.error(err);
@@ -86,51 +61,22 @@ export default function Gallery() {
     }
   };
 
-  const handleEdit = (photo) => {
-    setEditingId(photo._id);
-    setTitle(photo.title);
-  };
-
-  const handleDelete = async (photo) => {
-    if (!window.confirm("Delete this photo?")) return;
-    try {
-      await axios.delete(`https://jk-skin-clinic.onrender.com/api/photos/${photo._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchPhotos();
-    } catch (err) {
-      console.error(err);
-      alert("Delete failed");
-    }
-  };
-
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto bg-[#FEFEFE] rounded-lg shadow-md">
+    <div className="p-4 max-w-6xl mx-auto bg-[#FEFEFE] rounded-lg shadow-md">
       {token && (
-        <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="mb-4 flex items-center gap-3">
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setFile(e.target.files[0])}
-            className="border border-[#0A4833] rounded p-2 text-[#0A4833] w-full sm:w-1/2"
-          />
-          <input
-            type="text"
-            placeholder="Title (optional)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border border-[#0A4833] rounded p-2 text-[#0A4833] w-full sm:w-1/3"
+            className="border border-[#0A4833] rounded p-2"
           />
           <button
             onClick={handleUpload}
             disabled={loading}
             className="bg-[#0A4833] text-[#FEFEFE] px-4 py-2 rounded-md hover:opacity-90 transition-all"
           >
-            {loading
-              ? `Uploading... ${uploadPercent}%`
-              : editingId
-              ? "Update Photo"
-              : "Upload Photo"}
+            {loading ? `Uploading... ${uploadPercent}%` : "Upload Photo"}
           </button>
         </div>
       )}
@@ -146,31 +92,12 @@ export default function Gallery() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {photos.map((photo) => (
-          <div
-            key={photo._id}
-            className="relative border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]"
-          >
+          <div key={photo._id} className="border border-[#0A4833] rounded overflow-hidden">
             <img
               src={photo.image}
-              alt={photo.title || "Gallery"}
+              alt="Gallery"
               className="w-full h-72 object-cover transition-transform duration-500 hover:scale-105"
             />
-            {token && (
-              <div className="absolute top-2 right-2 flex gap-1">
-                <button
-                  onClick={() => handleEdit(photo)}
-                  className="bg-[#0A4833] text-[#FEFEFE] px-2 py-1 rounded text-xs hover:opacity-90 transition-all"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(photo)}
-                  className="bg-[#0A4833] text-[#FEFEFE] px-2 py-1 rounded text-xs hover:bg-[#083127] transition-all"
-                >
-                  X
-                </button>
-              </div>
-            )}
           </div>
         ))}
       </div>

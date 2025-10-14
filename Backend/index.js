@@ -6,8 +6,6 @@ import bcrypt from "bcryptjs";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
@@ -15,18 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Ensure uploads folder exists
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-
-// ==================== CLOUDINARY CONFIG ====================
+// ------------------- CLOUDINARY CONFIG -------------------
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ==================== MONGODB CONNECT ====================
+// ------------------- MONGODB CONNECT -------------------
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -34,7 +28,11 @@ mongoose.connect(process.env.MONGO_URI, {
 mongoose.connection.on("connected", () => console.log("✅ MongoDB connected"));
 mongoose.connection.on("error", (err) => console.error("❌ MongoDB error:", err));
 
-// ==================== MODELS ====================
+// ------------------- MULTER MEMORY STORAGE -------------------
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// ------------------- MODELS -------------------
 const UserSchema = new mongoose.Schema({
   username: { type: String, unique: true },
   password: String,
@@ -64,17 +62,15 @@ const PhotoSchema = new mongoose.Schema({
 });
 const Photo = mongoose.model("Photo", PhotoSchema);
 
-// ==================== MULTER (save to ./uploads) ====================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const safe = Date.now() + "-" + file.originalname.replace(/\s+/g, "-");
-    cb(null, safe);
-  },
+const VideoSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  videoUrl: String,
+  createdAt: { type: Date, default: Date.now },
 });
-const upload = multer({ storage });
+const Video = mongoose.model("Video", VideoSchema);
 
-// ==================== DEFAULT ADMIN ====================
+// ------------------- DEFAULT ADMIN -------------------
 const createAdminIfMissing = async () => {
   try {
     const admin = await User.findOne({ username: "admin" });
@@ -91,11 +87,10 @@ const createAdminIfMissing = async () => {
 };
 createAdminIfMissing();
 
-// ==================== LOGIN ROUTE ====================
+// ------------------- LOGIN -------------------
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ msg: "Invalid username or password" });
 
@@ -113,7 +108,17 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// ------------------ BLOG ROUTES ------------------
+// ==================== Helper for Cloudinary Memory Upload ====================
+const uploadToCloudinary = (buffer, folder, resource_type = "image") =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream({ folder, resource_type }, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    });
+    stream.end(buffer);
+  });
+
+// ------------------- BLOG ROUTES -------------------
 app.get("/api/blogs", async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
@@ -127,8 +132,7 @@ app.post("/api/blogs", upload.single("image"), async (req, res) => {
   try {
     let imageUrl = "";
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/blogs" });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      const result = await uploadToCloudinary(req.file.buffer, "website/blogs");
       imageUrl = result.secure_url;
     }
 
@@ -149,8 +153,7 @@ app.put("/api/blogs/:id", upload.single("image"), async (req, res) => {
     if (!blog) return res.status(404).json({ msg: "Blog not found" });
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/blogs" });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      const result = await uploadToCloudinary(req.file.buffer, "website/blogs");
       blog.image = result.secure_url;
     }
 
@@ -173,7 +176,7 @@ app.delete("/api/blogs/:id", async (req, res) => {
   }
 });
 
-// ------------------ ANNOUNCEMENT ROUTES ------------------
+// ------------------- ANNOUNCEMENT ROUTES -------------------
 app.get("/api/announcements", async (req, res) => {
   try {
     const ann = await Announcement.find().sort({ createdAt: -1 });
@@ -187,8 +190,7 @@ app.post("/api/announcements", upload.single("image"), async (req, res) => {
   try {
     let imageUrl = "";
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/announcements" });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      const result = await uploadToCloudinary(req.file.buffer, "website/announcements");
       imageUrl = result.secure_url;
     }
 
@@ -209,8 +211,7 @@ app.put("/api/announcements/:id", upload.single("image"), async (req, res) => {
     if (!ann) return res.status(404).json({ msg: "Announcement not found" });
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: "website/announcements" });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      const result = await uploadToCloudinary(req.file.buffer, "website/announcements");
       ann.image = result.secure_url;
     }
 
@@ -233,40 +234,27 @@ app.delete("/api/announcements/:id", async (req, res) => {
   }
 });
 
-// ==================== PHOTO ROUTES ====================
-
-// ✅ GET all photos
-router.get("/photos", async (req, res) => {
+// ------------------- PHOTO ROUTES -------------------
+app.get("/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ UPLOAD PHOTO (file → Cloudinary)
-router.post("/upload-photo", upload.single("photo"), async (req, res) => {
+app.post("/upload-photo", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
-
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "website/photos",
-    });
-
-    // Delete temp file
-    try { fs.unlinkSync(req.file.path); } catch (e) {}
-
+    const result = await uploadToCloudinary(req.file.buffer, "website/photos");
     res.json({ url: result.secure_url });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ msg: "Upload failed" });
   }
 });
 
-// ✅ POST new photo (save Cloudinary URL + title)
-router.post("/photos", async (req, res) => {
+app.post("/photos", async (req, res) => {
   try {
     const { image, title } = req.body;
     if (!image) return res.status(400).json({ msg: "No image URL provided" });
@@ -275,57 +263,39 @@ router.post("/photos", async (req, res) => {
       title: title || "Untitled",
       image,
     });
-
     res.json(newPhoto);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ UPDATE photo (title or replace image)
-router.put("/photos/:id", async (req, res) => {
+app.put("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
-    // Update image if provided
     if (req.body.image) photo.image = req.body.image;
     if (req.body.title) photo.title = req.body.title;
 
     await photo.save();
     res.json(photo);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ DELETE photo
-router.delete("/photos/:id", async (req, res) => {
+app.delete("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
-
     res.json({ msg: "Photo deleted" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ------------------ VIDEO TESTIMONIAL SCHEMA ------------------
-const VideoSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  videoUrl: String,
-  createdAt: { type: Date, default: Date.now },
-});
-const Video = mongoose.model("Video", VideoSchema);
-
-// ------------------ VIDEO ROUTES ------------------
-// Get all videos
-app.get("/api/videos",async (req, res) => {
+// ------------------- VIDEO ROUTES -------------------
+app.get("/api/videos", async (req, res) => {
   try {
     const videos = await Video.find().sort({ createdAt: -1 });
     res.json(videos);
@@ -334,41 +304,29 @@ app.get("/api/videos",async (req, res) => {
   }
 });
 
-// Add new video
-app.post("/api/videos",upload.single("video"), async (req, res) => {
+app.post("/api/videos", upload.single("video"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No video uploaded" });
-
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: "video",
-      folder: "website/videos",
-    });
-    try { fs.unlinkSync(req.file.path); } catch (e) {}
+    const result = await uploadToCloudinary(req.file.buffer, "website/videos", "video");
 
     const newVideo = await Video.create({
       title: req.body.title || "Untitled",
       description: req.body.description || "",
       videoUrl: result.secure_url,
     });
-
     res.json(newVideo);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Update video
 app.put("/api/videos/:id", upload.single("video"), async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).json({ msg: "Video not found" });
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        resource_type: "video",
-        folder: "website/videos",
-      });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      const result = await uploadToCloudinary(req.file.buffer, "website/videos", "video");
       video.videoUrl = result.secure_url;
     }
 
@@ -381,7 +339,6 @@ app.put("/api/videos/:id", upload.single("video"), async (req, res) => {
   }
 });
 
-// Delete video
 app.delete("/api/videos/:id", async (req, res) => {
   try {
     const video = await Video.findByIdAndDelete(req.params.id);
@@ -392,8 +349,6 @@ app.delete("/api/videos/:id", async (req, res) => {
   }
 });
 
-
-
-// ==================== START SERVER ====================
+// ------------------- START SERVER -------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
