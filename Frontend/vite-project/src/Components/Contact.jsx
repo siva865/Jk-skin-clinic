@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import bgImage from "../assets/Images/clinic-bg.jpg"; // 🔹 Make sure to add your photo inside assets/Images folder
+import bgImage from "../assets/Images/clinic-bg.JPG"; // 🔹 Make sure to add your photo inside assets/Images folder
 
 export default function Contact() {
   return (
