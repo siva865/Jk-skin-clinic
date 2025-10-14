@@ -40,7 +40,7 @@ export default function Gallery() {
       }
     );
 
-    return res.data.url;
+    return res.data.url; // Cloudinary URL
   };
 
   const handleUpload = async () => {
@@ -52,6 +52,7 @@ export default function Gallery() {
     try {
       const cloudUrl = await uploadToBackend(file);
 
+      // Save Cloudinary URL to backend
       await axios.post(
         "https://jk-skin-clinic.onrender.com/photos",
         { image: cloudUrl },
