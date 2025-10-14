@@ -28,7 +28,7 @@ export default function Gallery() {
     if (!file) return alert("Select a photo first");
 
     const formData = new FormData();
-    formData.append("image", file); // ✅ must match backend multer field name
+    formData.append("image", file); // must match backend
 
     setLoading(true);
     setUploadPercent(0);
@@ -48,7 +48,7 @@ export default function Gallery() {
         }
       );
 
-      console.log("Uploaded URL:", res.data.url);
+      console.log("Uploaded URL:", res.data.image);
       setFile(null);
       setUploadPercent(0);
       fetchPhotos(); // refresh gallery
@@ -96,7 +96,7 @@ export default function Gallery() {
             className="border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]"
           >
             <img
-              src={photo.url} // ✅ match backend field
+              src={`${photo.image}?t=${new Date().getTime()}`} // ✅ cache bypass
               alt="Gallery"
               className="w-full h-72 object-cover transition-transform duration-500 hover:scale-105"
             />
