@@ -126,7 +126,7 @@ export default function Navbar() {
                         navigate("/login");
                         setOpen(false);
                       }}
-                      className="text-2xl font-semibold bg-white text-[#0A4833] px-4 py-2 rounded hover:bg-[#F6D3A6]"
+                      className="text-2xl font-semibold text-white bg-[#0A4833] px-4 py-2 rounded hover:bg-[#F6D3A6]"
                     >
                       Login
                     </button>
@@ -138,7 +138,7 @@ export default function Navbar() {
                         handleLogout();
                         setOpen(false);
                       }}
-                      className="text-2xl font-semibold bg-white text-[#0A4833] px-4 py-2 rounded hover:bg-[#F6D3A6]"
+                      className="text-2xl font-semibold text-white bg-[#0A4833] px-4 py-2 rounded hover:bg-[#F6D3A6]"
                     >
                       Logout
                     </button>

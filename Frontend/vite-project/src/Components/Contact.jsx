@@ -1,12 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
-import bgImage from "../assets/Images/clinic-bg.JPG"; // 🔹 Make sure to add your photo inside assets/Images folder
 
 export default function Contact() {
   return (
     <section
-      className="relative min-h-screen flex flex-col justify-center items-center  text-center px-6 py-20 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 py-20 bg-cover bg-center bg-no-repeat"
+      style={{ 
+        // ✅ Use public folder path for deploy-safe background
+        backgroundImage: `url(/clinic-bg.JPG)` 
+      }}
     >
       {/* Overlay for better text visibility */}
       <div className="absolute inset-0 bg-black/40"></div>
@@ -20,7 +22,7 @@ export default function Contact() {
         transition={{ duration: 0.6 }}
       >
         <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#0A4833] mb-6">
-          Jk Skin Clinic
+          JK Skin Clinic
         </h2>
 
         <p className="text-[#0A4833] text-lg mb-2">

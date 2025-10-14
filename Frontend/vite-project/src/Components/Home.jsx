@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import bgImage from "../assets/Images/bg.JPG";
 import axios from "axios";
 import AnnouncementPopup from "./AnnouncementPopup";
 
@@ -13,7 +12,9 @@ export default function Home() {
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
-        const res = await axios.get("https://jk-skin-clinic.onrender.com/api/announcements");
+        const res = await axios.get(
+          "https://jk-skin-clinic.onrender.com/api/announcements"
+        );
         if (res.data && res.data.length > 0) {
           const latest = res.data[res.data.length - 1];
           setAnnouncement(latest.content);
@@ -34,7 +35,8 @@ export default function Home() {
     <section
       className="min-h-[90vh] flex flex-col justify-center items-center text-center px-6 relative"
       style={{
-        backgroundImage: `url(${bgImage})`,
+        // ✅ Use public folder path for deploy-safe background
+        backgroundImage: `url(/bg.JPG)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

@@ -113,7 +113,7 @@ export default function Gallery() {
           </div>
         ) : (
           <p className="text-gray-500 mt-4">
-            🔒 Please log in to upload or delete photos.
+            
           </p>
         )}
       </div>
