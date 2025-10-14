@@ -235,7 +235,7 @@ app.delete("/api/announcements/:id", async (req, res) => {
 });
 
 // ------------------- GET all photos -------------------
-app.get("/photos", async (req, res) => {
+app.get("/api/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
@@ -246,7 +246,7 @@ app.get("/photos", async (req, res) => {
 });
 
 // ------------------- UPLOAD PHOTO to Cloudinary -------------------
-app.post("/upload-photo", upload.single("photo"), async (req, res) => {
+app.post("/api/upload-photo", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
@@ -272,7 +272,7 @@ app.post("/upload-photo", upload.single("photo"), async (req, res) => {
 });
 
 // ------------------- POST new photo (save Cloudinary URL + title) -------------------
-app.post("/photos", async (req, res) => {
+app.post("/api/photos", async (req, res) => {
   try {
     const { image, title } = req.body;
     if (!image) return res.status(400).json({ msg: "No image URL provided" });
@@ -290,7 +290,7 @@ app.post("/photos", async (req, res) => {
 });
 
 // ------------------- UPDATE photo -------------------
-app.put("/photos/:id", async (req, res) => {
+app.put("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
@@ -307,7 +307,7 @@ app.put("/photos/:id", async (req, res) => {
 });
 
 // ------------------- DELETE photo -------------------
-app.delete("/photos/:id", async (req, res) => {
+app.delete("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
