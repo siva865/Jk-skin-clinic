@@ -27,7 +27,7 @@ export default function Gallery() {
     formData.append("photo", file);
 
     const res = await axios.post(
-      "https://jk-skin-clinic.onrender.com/api/upload-photo",
+      "https://jk-skin-clinic.onrender.com/api/photo",
       formData,
       {
         headers: {
