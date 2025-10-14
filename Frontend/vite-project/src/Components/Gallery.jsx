@@ -5,12 +5,9 @@ export default function Gallery() {
   const [photos, setPhotos] = useState([]);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0); // ✅ progress %
   const [editingId, setEditingId] = useState(null);
   const token = localStorage.getItem("token");
-
-  // Cloudinary config
-  const CLOUD_NAME = "dmptpis3d";
-  const UPLOAD_PRESET = "jkclinic_unsigned"; // Must exist in Cloudinary as unsigned
 
   useEffect(() => {
     fetchPhotos();
@@ -26,32 +23,39 @@ export default function Gallery() {
     }
   };
 
-  const uploadToCloudinary = async (file) => {
+  // ✅ Upload file to backend (with progress)
+  const uploadToBackend = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
 
-    // Debug FormData
-    // for (let pair of formData.entries()) { console.log(pair[0], pair[1]); }
+    const res = await axios.post(
+      "https://jk-skin-clinic.onrender.com/api/upload",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        // Track upload progress here
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadPercent(percent);
+        },
+      }
+    );
 
-    try {
-      const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        formData
-      );
-      return res.data.secure_url;
-    } catch (err) {
-      console.error("Cloudinary upload failed:", err);
-      throw err;
-    }
+    return res.data.url;
   };
 
   const handleUpload = async () => {
     if (!file) return alert("Select a photo first");
     setLoading(true);
+    setUploadPercent(0);
 
     try {
-      const cloudUrl = await uploadToCloudinary(file);
+      const cloudUrl = await uploadToBackend(file);
       const payload = { image: cloudUrl };
 
       if (editingId) {
@@ -74,10 +78,12 @@ export default function Gallery() {
       alert("Upload failed");
     } finally {
       setLoading(false);
+      setUploadPercent(0);
     }
   };
 
   const handleEdit = (photo) => setEditingId(photo._id);
+
   const handleDelete = async (photo) => {
     if (!window.confirm("Delete this photo?")) return;
     try {
@@ -107,7 +113,7 @@ export default function Gallery() {
             className="bg-[#0A4833] text-[#FEFEFE] px-4 py-2 rounded-md hover:opacity-90 transition-all"
           >
             {loading
-              ? "Uploading..."
+              ? `Uploading... ${uploadPercent}%`
               : editingId
               ? "Update Photo"
               : "Upload Photo"}
@@ -115,9 +121,22 @@ export default function Gallery() {
         </div>
       )}
 
+      {/* ✅ Progress bar visible only when uploading */}
+      {loading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+          <div
+            className="bg-[#0A4833] h-2.5 rounded-full transition-all duration-200"
+            style={{ width: `${uploadPercent}%` }}
+          ></div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {photos.map((photo) => (
-          <div key={photo._id} className="relative border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]">
+          <div
+            key={photo._id}
+            className="relative border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]"
+          >
             <img
               src={photo.image}
               alt={photo.title || "Gallery"}

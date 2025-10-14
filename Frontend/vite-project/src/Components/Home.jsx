@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import bgImage from "../assets/Images/bg.JPG";
+import bgImage from "../assets/Images/bg.jpg";
 import axios from "axios";
 import AnnouncementPopup from "./AnnouncementPopup";
 
