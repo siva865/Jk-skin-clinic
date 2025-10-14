@@ -245,57 +245,56 @@ app.get("/api/photos", async (req, res) => {
   }
 });
 
-// ------------------- UPLOAD PHOTO to Cloudinary -------------------
-app.post("/api/photos", upload.single("photo"), async (req, res) => {
+// ------------------- UPLOAD PHOTO (Cloudinary + Save to DB) -------------------
+app.post("/api/photos", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
-    // Use upload_stream for memoryStorage
-    const streamUpload = (req) =>
-      new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "website/photos" },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "website/photos" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
 
-    const result = await streamUpload(req);
-    res.json({ url: result.secure_url });
+    // Save to MongoDB
+    const newPhoto = await Photo.create({
+      title: req.body.title || "Untitled",
+      image: result.secure_url,
+    });
+
+    res.json(newPhoto);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Upload failed" });
   }
 });
 
-// ------------------- POST new photo (save Cloudinary URL + title) -------------------
-app.post("/api/photos", async (req, res) => {
-  try {
-    const { image, title } = req.body;
-    if (!image) return res.status(400).json({ msg: "No image URL provided" });
-
-    const newPhoto = await Photo.create({
-      title: title || "Untitled",
-      image,
-    });
-
-    res.json(newPhoto);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ------------------- UPDATE photo -------------------
-app.put("/api/photos/:id", async (req, res) => {
+// ------------------- UPDATE PHOTO -------------------
+app.put("/api/photos/:id", upload.single("image"), async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
-    if (req.body.image) photo.image = req.body.image;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "website/photos" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+      photo.image = result.secure_url;
+    }
+
     if (req.body.title) photo.title = req.body.title;
 
     await photo.save();
@@ -306,18 +305,18 @@ app.put("/api/photos/:id", async (req, res) => {
   }
 });
 
-// ------------------- DELETE photo -------------------
+// ------------------- DELETE PHOTO -------------------
 app.delete("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
-
     res.json({ msg: "Photo deleted" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // ------------------- VIDEO ROUTES -------------------
 app.get("/api/videos", async (req, res) => {

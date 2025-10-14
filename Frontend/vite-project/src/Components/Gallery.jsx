@@ -14,7 +14,9 @@ export default function Gallery() {
 
   const fetchPhotos = async () => {
     try {
-      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/photos");
+      const res = await axios.get(
+        "https://jk-skin-clinic.onrender.com/api/photos"
+      );
       setPhotos(res.data);
     } catch (err) {
       console.error(err);
@@ -22,50 +24,34 @@ export default function Gallery() {
     }
   };
 
-  const uploadToBackend = async (file) => {
-    const formData = new FormData();
-    formData.append("photo", file);
-
-    const res = await axios.post(
-      "https://jk-skin-clinic.onrender.com/api/photos",
-      formData,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (e) => {
-          setUploadPercent(Math.round((e.loaded * 100) / e.total));
-        },
-      }
-    );
-
-    return res.data.url; // Cloudinary URL
-  };
-
   const handleUpload = async () => {
     if (!file) return alert("Select a photo first");
+
+    const formData = new FormData();
+    formData.append("image", file); // ✅ must match backend multer field name
 
     setLoading(true);
     setUploadPercent(0);
 
     try {
-      const cloudUrl = await uploadToBackend(file);
-
-      // Save Cloudinary URL to backend
-      await axios.post(
+      const res = await axios.post(
         "https://jk-skin-clinic.onrender.com/api/photos",
-        { image: cloudUrl },
+        formData,
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (e) => {
+            setUploadPercent(Math.round((e.loaded * 100) / e.total));
           },
         }
       );
 
+      console.log("Uploaded URL:", res.data.url);
       setFile(null);
       setUploadPercent(0);
-      fetchPhotos();
+      fetchPhotos(); // refresh gallery
     } catch (err) {
       console.error(err);
       alert("Upload failed");
@@ -110,7 +96,7 @@ export default function Gallery() {
             className="border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]"
           >
             <img
-              src={photo.image}
+              src={photo.url} // ✅ match backend field
               alt="Gallery"
               className="w-full h-72 object-cover transition-transform duration-500 hover:scale-105"
             />
