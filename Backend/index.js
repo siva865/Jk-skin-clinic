@@ -236,17 +236,18 @@ app.delete("/api/announcements/:id", async (req, res) => {
 // ==================== PHOTO ROUTES ====================
 
 // ✅ GET all photos
-app.get("/api/photos", async (req, res) => {
+router.get("/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ✅ UPLOAD PHOTO (file → Cloudinary)
-app.post("/api/upload-photo", upload.single("photo"), async (req, res) => {
+router.post("/upload-photo", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
@@ -254,6 +255,7 @@ app.post("/api/upload-photo", upload.single("photo"), async (req, res) => {
       folder: "website/photos",
     });
 
+    // Delete temp file
     try { fs.unlinkSync(req.file.path); } catch (e) {}
 
     res.json({ url: result.secure_url });
@@ -264,7 +266,7 @@ app.post("/api/upload-photo", upload.single("photo"), async (req, res) => {
 });
 
 // ✅ POST new photo (save Cloudinary URL + title)
-app.post("/api/photos", async (req, res) => {
+router.post("/photos", async (req, res) => {
   try {
     const { image, title } = req.body;
     if (!image) return res.status(400).json({ msg: "No image URL provided" });
@@ -276,41 +278,38 @@ app.post("/api/photos", async (req, res) => {
 
     res.json(newPhoto);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ✅ UPDATE photo (title or replace image)
-app.put("/api/photos/:id", upload.single("photo"), async (req, res) => {
+router.put("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
-    // If file uploaded, replace image
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "website/photos",
-      });
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
-      photo.image = result.secure_url;
-    }
-
+    // Update image if provided
+    if (req.body.image) photo.image = req.body.image;
     if (req.body.title) photo.title = req.body.title;
+
     await photo.save();
     res.json(photo);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ✅ DELETE photo
-app.delete("/api/photos/:id", async (req, res) => {
+router.delete("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
     res.json({ msg: "Photo deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
