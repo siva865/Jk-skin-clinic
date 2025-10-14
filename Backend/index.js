@@ -246,7 +246,7 @@ app.get("/api/photos", async (req, res) => {
 });
 
 // ------------------- UPLOAD PHOTO to Cloudinary -------------------
-app.post("/api/photo", upload.single("photo"), async (req, res) => {
+app.post("/api/photos", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
