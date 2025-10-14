@@ -6,8 +6,7 @@ export default function Gallery() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
-  const [editingId, setEditingId] = useState(null);
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token"); // optional auth
 
   useEffect(() => {
     fetchPhotos();
@@ -15,7 +14,7 @@ export default function Gallery() {
 
   const fetchPhotos = async () => {
     try {
-      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/photos");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/photos");
       setPhotos(res.data);
     } catch (err) {
       console.error(err);
@@ -26,50 +25,63 @@ export default function Gallery() {
   const uploadToBackend = async (file) => {
     const formData = new FormData();
     formData.append("photo", file);
+
     const res = await axios.post(
-      "https://jk-skin-clinic.onrender.com/api/upload-photo",
+      "https://jk-skin-clinic.onrender.com/upload-photo",
       formData,
       {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-        onUploadProgress: (e) => setUploadPercent(Math.round((e.loaded * 100) / e.total)),
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (e) => {
+          setUploadPercent(Math.round((e.loaded * 100) / e.total));
+        },
       }
     );
+
     return res.data.url;
   };
 
   const handleUpload = async () => {
     if (!file) return alert("Select a photo first");
+
     setLoading(true);
     setUploadPercent(0);
 
     try {
       const cloudUrl = await uploadToBackend(file);
+
       await axios.post(
-        "https://jk-skin-clinic.onrender.com/api/photos",
+        "https://jk-skin-clinic.onrender.com/photos",
         { image: cloudUrl },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
       );
 
       setFile(null);
+      setUploadPercent(0);
       fetchPhotos();
     } catch (err) {
       console.error(err);
       alert("Upload failed");
     } finally {
       setLoading(false);
-      setUploadPercent(0);
     }
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto bg-[#FEFEFE] rounded-lg shadow-md">
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto bg-[#FEFEFE] rounded-lg shadow-md">
       {token && (
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-6 flex gap-3 items-center">
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setFile(e.target.files[0])}
-            className="border border-[#0A4833] rounded p-2"
+            className="border border-[#0A4833] rounded p-2 text-[#0A4833]"
           />
           <button
             onClick={handleUpload}
@@ -86,13 +98,16 @@ export default function Gallery() {
           <div
             className="bg-[#0A4833] h-2.5 rounded-full transition-all duration-200"
             style={{ width: `${uploadPercent}%` }}
-          ></div>
+          />
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {photos.map((photo) => (
-          <div key={photo._id} className="border border-[#0A4833] rounded overflow-hidden">
+          <div
+            key={photo._id}
+            className="border border-[#0A4833] rounded overflow-hidden bg-[#FEFEFE]"
+          >
             <img
               src={photo.image}
               alt="Gallery"

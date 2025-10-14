@@ -234,26 +234,44 @@ app.delete("/api/announcements/:id", async (req, res) => {
   }
 });
 
-// ------------------- PHOTO ROUTES -------------------
+// ------------------- GET all photos -------------------
 app.get("/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// ------------------- UPLOAD PHOTO to Cloudinary -------------------
 app.post("/upload-photo", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
-    const result = await uploadToCloudinary(req.file.buffer, "website/photos");
+
+    // Use upload_stream for memoryStorage
+    const streamUpload = (req) =>
+      new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "website/photos" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+
+    const result = await streamUpload(req);
     res.json({ url: result.secure_url });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Upload failed" });
   }
 });
 
+// ------------------- POST new photo (save Cloudinary URL + title) -------------------
 app.post("/photos", async (req, res) => {
   try {
     const { image, title } = req.body;
@@ -263,12 +281,15 @@ app.post("/photos", async (req, res) => {
       title: title || "Untitled",
       image,
     });
+
     res.json(newPhoto);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// ------------------- UPDATE photo -------------------
 app.put("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
@@ -280,16 +301,20 @@ app.put("/photos/:id", async (req, res) => {
     await photo.save();
     res.json(photo);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// ------------------- DELETE photo -------------------
 app.delete("/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
+
     res.json({ msg: "Photo deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
