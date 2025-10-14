@@ -233,37 +233,45 @@ app.delete("/api/announcements/:id", async (req, res) => {
   }
 });
 
-// ------------------ PHOTO ROUTES ------------------
-// ✅ GET all photosapp.get("/api/photos", async (req, res) => {
+// ==================== PHOTO ROUTES ====================
+
+// ✅ GET all photos
+app.get("/api/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
 
-
-// POST a new photo (file upload)
-app.post("/api/photos", upload.single("photo"), async (req, res) => {
+// ✅ UPLOAD PHOTO (file → Cloudinary)
+app.post("/api/upload-photo", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
-    // Upload file buffer to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "photos" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      stream.end(req.file.buffer);
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "website/photos",
     });
 
-    // Save photo in MongoDB
+    try { fs.unlinkSync(req.file.path); } catch (e) {}
+
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Upload failed" });
+  }
+});
+
+// ✅ POST new photo (save Cloudinary URL + title)
+app.post("/api/photos", async (req, res) => {
+  try {
+    const { image, title } = req.body;
+    if (!image) return res.status(400).json({ msg: "No image URL provided" });
+
     const newPhoto = await Photo.create({
-      title: req.body.title || "Untitled",
-      image: result.secure_url,
+      title: title || "Untitled",
+      image,
     });
 
     res.json(newPhoto);
@@ -272,17 +280,22 @@ app.post("/api/photos", upload.single("photo"), async (req, res) => {
   }
 });
 
-// UPDATE photo (replace URL or title)
-app.put("/api/photos/:id", async (req, res) => {
+// ✅ UPDATE photo (title or replace image)
+app.put("/api/photos/:id", upload.single("photo"), async (req, res) => {
   try {
-    const { image, title } = req.body;
-
     const photo = await Photo.findById(req.params.id);
     if (!photo) return res.status(404).json({ msg: "Photo not found" });
 
-    if (image) photo.image = image;
-    if (title) photo.title = title;
+    // If file uploaded, replace image
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "website/photos",
+      });
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      photo.image = result.secure_url;
+    }
 
+    if (req.body.title) photo.title = req.body.title;
     await photo.save();
     res.json(photo);
   } catch (err) {
@@ -290,7 +303,7 @@ app.put("/api/photos/:id", async (req, res) => {
   }
 });
 
-// DELETE photo
+// ✅ DELETE photo
 app.delete("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
@@ -301,8 +314,6 @@ app.delete("/api/photos/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
 
 // ------------------ VIDEO TESTIMONIAL SCHEMA ------------------
 const VideoSchema = new mongoose.Schema({

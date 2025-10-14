@@ -5,8 +5,9 @@ export default function Gallery() {
   const [photos, setPhotos] = useState([]);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [uploadPercent, setUploadPercent] = useState(0); // ✅ progress %
+  const [uploadPercent, setUploadPercent] = useState(0);
   const [editingId, setEditingId] = useState(null);
+  const [title, setTitle] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -23,30 +24,26 @@ export default function Gallery() {
     }
   };
 
-  // ✅ Upload file to backend (with progress)
+  // Upload file to Cloudinary via backend
   const uploadToBackend = async (file) => {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("photo", file); // must match backend
 
     const res = await axios.post(
-      "https://jk-skin-clinic.onrender.com/api/upload",
+      "https://jk-skin-clinic.onrender.com/api/upload-photo",
       formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
-        // Track upload progress here
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadPercent(percent);
+        onUploadProgress: (e) => {
+          setUploadPercent(Math.round((e.loaded * 100) / e.total));
         },
       }
     );
 
-    return res.data.url;
+    return res.data.url; // Cloudinary URL
   };
 
   const handleUpload = async () => {
@@ -55,8 +52,12 @@ export default function Gallery() {
     setUploadPercent(0);
 
     try {
-      const cloudUrl = await uploadToBackend(file);
-      const payload = { image: cloudUrl };
+      let cloudUrl = editingId ? null : await uploadToBackend(file);
+
+      // If editing and new file selected, upload it
+      if (editingId && file) cloudUrl = await uploadToBackend(file);
+
+      const payload = { image: cloudUrl, title };
 
       if (editingId) {
         await axios.put(
@@ -65,12 +66,15 @@ export default function Gallery() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        await axios.post("https://jk-skin-clinic.onrender.com/api/photos", payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.post(
+          "https://jk-skin-clinic.onrender.com/api/photos",
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       }
 
       setFile(null);
+      setTitle("");
       setEditingId(null);
       fetchPhotos();
     } catch (err) {
@@ -82,7 +86,10 @@ export default function Gallery() {
     }
   };
 
-  const handleEdit = (photo) => setEditingId(photo._id);
+  const handleEdit = (photo) => {
+    setEditingId(photo._id);
+    setTitle(photo.title);
+  };
 
   const handleDelete = async (photo) => {
     if (!window.confirm("Delete this photo?")) return;
@@ -107,6 +114,13 @@ export default function Gallery() {
             onChange={(e) => setFile(e.target.files[0])}
             className="border border-[#0A4833] rounded p-2 text-[#0A4833] w-full sm:w-1/2"
           />
+          <input
+            type="text"
+            placeholder="Title (optional)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="border border-[#0A4833] rounded p-2 text-[#0A4833] w-full sm:w-1/3"
+          />
           <button
             onClick={handleUpload}
             disabled={loading}
@@ -121,7 +135,6 @@ export default function Gallery() {
         </div>
       )}
 
-      {/* ✅ Progress bar visible only when uploading */}
       {loading && (
         <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
           <div
