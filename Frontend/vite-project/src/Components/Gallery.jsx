@@ -7,9 +7,10 @@ export default function Gallery() {
   const [loading, setLoading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
 
-   const token = localStorage.getItem("token");
+  // ✅ Read token from localStorage
+  const token = localStorage.getItem("token");
 
-  // ✅ Fetch all photos from backend
+  // ✅ Fetch all photos when component loads
   useEffect(() => {
     fetchPhotos();
   }, []);
@@ -25,7 +26,22 @@ export default function Gallery() {
 
   // ✅ Handle Upload
   const handleUpload = async () => {
-    if (!file) return alert("Select an image first!");
+    if (!token) {
+      alert("You must be logged in to upload photos!");
+      return;
+    }
+
+    if (!file) {
+      alert("Please select an image first!");
+      return;
+    }
+
+    // ✅ Restrict file size to max 50MB
+    const maxSize = 50 * 1024 * 1024; // 50 MB
+    if (file.size > maxSize) {
+      alert("File too large! Please upload an image under 50MB.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("image", file); // must match backend field name
@@ -33,72 +49,98 @@ export default function Gallery() {
     try {
       setLoading(true);
       const res = await axios.post("https://jk-skin-clinic.onrender.com/api/photos", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
         onUploadProgress: (p) =>
           setUploadPercent(Math.round((p.loaded * 100) / p.total)),
       });
 
+      // ✅ Add new photo to state
       setPhotos((prev) => [res.data, ...prev]);
       setFile(null);
       setUploadPercent(0);
       setLoading(false);
     } catch (err) {
       console.error("Upload failed:", err);
+      alert("Upload failed! Please check your login or file size.");
       setLoading(false);
     }
   };
 
-  // ✅ Delete Photo
+  // ✅ Handle Delete
   const handleDelete = async (id) => {
+    if (!token) {
+      alert("You must be logged in to delete photos!");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this photo?")) return;
+
     try {
-      await axios.delete(`https://jk-skin-clinic.onrender.com/api/photos/${id}`);
+      await axios.delete(`https://jk-skin-clinic.onrender.com/api/photos/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setPhotos((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       console.error("Error deleting photo:", err);
+      alert("Delete failed! Please check your login.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">📸 JK Skin Clinic Gallery</h1>
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="border rounded p-2 w-full sm:w-auto"
-          />
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            {loading ? `Uploading ${uploadPercent}%` : "Upload Photo"}
-          </button>
-        </div>
+    <div className="min-h-screen bg-white text-[#064e3b] py-8 px-4">
+      <div className="max-w-4xl mx-auto text-center mb-10">
+        <h1 className="text-3xl font-bold mb-4">📸 JK Skin Clinic Gallery</h1>
+
+        {/* ✅ Show upload section only if logged in */}
+        {token ? (
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files[0])}
+              className="border border-[#064e3b] rounded-lg p-2 w-full sm:w-auto text-[#064e3b]"
+            />
+            <button
+              onClick={handleUpload}
+              disabled={loading}
+              className="bg-[#064e3b] text-white px-5 py-2 rounded-lg hover:bg-[#043b2d] transition"
+            >
+              {loading ? `Uploading ${uploadPercent}%` : "Upload Photo"}
+            </button>
+          </div>
+        ) : (
+          <p className="text-gray-500 mt-4">
+            🔒 Please log in to upload or delete photos.
+          </p>
+        )}
       </div>
 
-      {/* ✅ Responsive Grid */}
+      {/* ✅ Gallery Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {photos.length > 0 ? (
           photos.map((photo) => (
             <div
               key={photo._id}
-              className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition"
+              className="relative bg-white border-2 border-[#064e3b] rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition"
             >
               <img
                 src={photo.image}
                 alt="Uploaded"
                 className="w-full h-80 object-cover"
               />
-              <button
-                onClick={() => handleDelete(photo._id)}
-                className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-3 py-1 text-sm hover:bg-red-700 transition"
-              >
-                Delete
-              </button>
+
+              {/* ✅ Delete button visible only for logged-in users */}
+              {token && (
+                <button
+                  onClick={() => handleDelete(photo._id)}
+                  className="absolute top-2 right-2 bg-[#064e3b] text-white rounded-full px-3 py-1 text-sm hover:bg-[#043b2d] transition"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))
         ) : (
