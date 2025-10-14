@@ -7,6 +7,8 @@ export default function Gallery() {
   const [loading, setLoading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
 
+   const token = localStorage.getItem("token");
+
   // ✅ Fetch all photos from backend
   useEffect(() => {
     fetchPhotos();
