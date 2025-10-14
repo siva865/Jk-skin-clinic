@@ -234,28 +234,36 @@ app.delete("/api/announcements/:id", async (req, res) => {
 });
 
 // ------------------ PHOTO ROUTES ------------------
-// ✅ GET all photos
-app.get("/api/photos", async (req, res) => {
+// ✅ GET all photosapp.get("/api/photos", async (req, res) => {
   try {
     const photos = await Photo.find().sort({ createdAt: -1 });
     res.json(photos);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
 
-// ✅ POST a new photo (Cloudinary URL comes from frontend)
-app.post("/api/photos", async (req, res) => {
+
+// POST a new photo (file upload)
+app.post("/api/photos", upload.single("photo"), async (req, res) => {
   try {
-    const { image, title } = req.body;
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
-    if (!image) {
-      return res.status(400).json({ msg: "No image URL provided" });
-    }
+    // Upload file buffer to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "photos" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
 
+    // Save photo in MongoDB
     const newPhoto = await Photo.create({
-      title: title || "Untitled",
-      image,
+      title: req.body.title || "Untitled",
+      image: result.secure_url,
     });
 
     res.json(newPhoto);
@@ -264,7 +272,7 @@ app.post("/api/photos", async (req, res) => {
   }
 });
 
-// ✅ UPDATE photo (replace URL or title)
+// UPDATE photo (replace URL or title)
 app.put("/api/photos/:id", async (req, res) => {
   try {
     const { image, title } = req.body;
@@ -282,7 +290,7 @@ app.put("/api/photos/:id", async (req, res) => {
   }
 });
 
-// ✅ DELETE photo
+// DELETE photo
 app.delete("/api/photos/:id", async (req, res) => {
   try {
     const photo = await Photo.findByIdAndDelete(req.params.id);
@@ -293,6 +301,8 @@ app.delete("/api/photos/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 // ------------------ VIDEO TESTIMONIAL SCHEMA ------------------
 const VideoSchema = new mongoose.Schema({
