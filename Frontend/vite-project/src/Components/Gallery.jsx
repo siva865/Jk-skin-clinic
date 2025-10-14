@@ -14,7 +14,7 @@ export default function Gallery() {
 
   const fetchPhotos = async () => {
     try {
-      const res = await axios.get("https://jk-skin-clinic.onrender.com/photos");
+      const res = await axios.get("https://jk-skin-clinic.onrender.com/api/photos");
       setPhotos(res.data);
     } catch (err) {
       console.error(err);
@@ -27,7 +27,7 @@ export default function Gallery() {
     formData.append("photo", file);
 
     const res = await axios.post(
-      "https://jk-skin-clinic.onrender.com/upload-photo",
+      "https://jk-skin-clinic.onrender.com/api/upload-photo",
       formData,
       {
         headers: {
@@ -54,7 +54,7 @@ export default function Gallery() {
 
       // Save Cloudinary URL to backend
       await axios.post(
-        "https://jk-skin-clinic.onrender.com/photos",
+        "https://jk-skin-clinic.onrender.com/api/photos",
         { image: cloudUrl },
         {
           headers: {
