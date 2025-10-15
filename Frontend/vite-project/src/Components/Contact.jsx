@@ -6,8 +6,8 @@ export default function Contact() {
     <section
       className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 py-20 bg-cover bg-center bg-no-repeat"
       style={{ 
-        // ✅ Use public folder path for deploy-safe background
-        backgroundImage: `url(/clinic-bg.jpg)` 
+        // ✅ Cloudinary hosted background image (deploy-safe)
+        backgroundImage: `url("https://res.cloudinary.com/dmptpis3d/image/upload/v1760507178/clinic-bg_yrs49q.jpg")`
       }}
     >
       {/* Overlay for better text visibility */}
@@ -34,7 +34,10 @@ export default function Contact() {
         </p>
 
         <p className="text-[#0A4833] text-lg font-semibold">
-          📞 Ph: <a href="tel:+917200212121" className="underline">+91 72002 12121</a>
+          📞 Ph:{" "}
+          <a href="tel:+917200212121" className="underline">
+            +91 72002 12121
+          </a>
         </p>
 
         <div className="mt-8 w-full h-64 md:h-80 rounded-xl overflow-hidden shadow-lg border-4 border-[#0A4833]/30">

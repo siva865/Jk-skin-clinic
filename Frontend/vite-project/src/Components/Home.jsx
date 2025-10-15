@@ -35,10 +35,11 @@ export default function Home() {
     <section
       className="min-h-[90vh] flex flex-col justify-center items-center text-center px-6 relative"
       style={{
-        // ✅ Use public folder path for deploy-safe background
-        backgroundImage: `url(/bg.jpg)`,
+        // ✅ Cloudinary hosted background (deploy-safe)
+        backgroundImage: `url("https://res.cloudinary.com/dmptpis3d/image/upload/v1760507453/bg_qgverh.jpg")`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Announcement Popup */}
