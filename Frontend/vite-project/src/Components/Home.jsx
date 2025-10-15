@@ -36,7 +36,7 @@ export default function Home() {
       className="min-h-[90vh] flex flex-col justify-center items-center text-center px-6 relative"
       style={{
         // ✅ Use public folder path for deploy-safe background
-        backgroundImage: `url(/bg.JPG)`,
+        backgroundImage: `url(/bg.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

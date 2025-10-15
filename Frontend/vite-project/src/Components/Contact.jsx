@@ -7,7 +7,7 @@ export default function Contact() {
       className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 py-20 bg-cover bg-center bg-no-repeat"
       style={{ 
         // ✅ Use public folder path for deploy-safe background
-        backgroundImage: `url(/clinic-bg.JPG)` 
+        backgroundImage: `url(/clinic-bg.jpg)` 
       }}
     >
       {/* Overlay for better text visibility */}
