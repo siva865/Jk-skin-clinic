@@ -78,7 +78,7 @@ export default function Treatments() {
           Treatments & Procedures
         </motion.h2>
 
-        {/* Medical Treatments */}
+        {/* ---------- Medical Treatments ---------- */}
         <motion.div
           className="bg-[#0A4833] rounded-2xl p-8 mb-12 shadow-lg"
           initial={{ opacity: 0, y: 30 }}
@@ -135,7 +135,7 @@ export default function Treatments() {
           </div>
         </motion.div>
 
-        {/* Aesthetic Procedures */}
+        {/* ---------- Aesthetic Procedures ---------- */}
         <motion.div
           className="bg-[#0A4833] rounded-2xl p-8 shadow-lg"
           initial={{ opacity: 0, y: 40 }}
@@ -158,14 +158,16 @@ export default function Treatments() {
                 onMouseEnter={() => !isMobile && setOpenAestheticIndex(idx)}
                 onMouseLeave={() => !isMobile && setOpenAestheticIndex(null)}
               >
-                {/* Image */}
-                <img
-                  src={procedure.image}
-                  alt={procedure.title}
-                  className="w-full h-40 object-cover rounded-t-xl"
-                />
+                {/* ---------- Image Full Visible ---------- */}
+                <div className="w-full h-64 md:h-72 overflow-hidden">
+                  <img
+                    src={procedure.image}
+                    alt={procedure.title}
+                    className="w-full h-full object-cover rounded-t-xl transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
 
-                {/* Title + Details */}
+                {/* ---------- Text ---------- */}
                 <div className="p-5">
                   <h4 className="text-lg font-semibold text-[#0A4833] mb-2">
                     {procedure.title}
