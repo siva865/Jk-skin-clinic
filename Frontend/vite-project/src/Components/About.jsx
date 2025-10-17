@@ -20,7 +20,7 @@ export default function About() {
         >
           <img
             src={doctorPhoto}
-            alt="Dr. Vasantha Manju"
+            alt="Dr. M. Vasantha Manju - Dermatologist"
             className="rounded-xl shadow-lg w-full object-cover"
           />
         </motion.div>
@@ -32,26 +32,32 @@ export default function About() {
           whileInView={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Doctor Name */}
+          {/* Doctor Name (Single Line, Responsive Font) */}
           <h2
-            className="font-serif font-bold text-[#0A4833] mb-4 bg-[#FEFEFE] px-4 py-2 rounded-lg 
-                       shadow-sm inline-block whitespace-nowrap max-w-full overflow-hidden text-center"
-            style={{ fontSize: "clamp(1.3rem, 4vw, 2.2rem)" }}
-          >
-            Dr.&nbsp;
-            <span className="text-[#0A4833] underline decoration-2">
-              Vasantha&nbsp;Manju
-            </span>
-          </h2>
+  className="font-serif font-normal text-[#0A4833] mb-6 bg-white px-4 py-2 rounded-lg shadow-sm inline-block text-center w-full overflow-hidden"
+  style={{
+    fontSize: "0.8rem", // smaller size
+    lineHeight: "1.3",
+    letterSpacing: "0.3px",
+    borderBottom: "3px solid #0A4833",
+    whiteSpace: "nowrap", // keep single line
+    textOverflow: "ellipsis",
+  }}
+>
+  Dr.&nbsp;<span className="text-[#0A4833]">M. Vasantha Manju</span>
+  &nbsp;–&nbsp;
+  <span className="text-[#0A4833] font-normal">Dermatologist</span>
+</h2>
+
 
           {/* Experience */}
           <motion.div
-            className="mb-6"
+            className="mb-6 text-center lg:text-left"
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <button className="bg-[#0A4833] text-[#FEFEFE] font-semibold px-6 py-2 rounded-full shadow-md text-lg hover:opacity-90 transition-all duration-300">
+            <button className="bg-[#0A4833] text-[#FEFEFE] font-semibold px-8 py-2 rounded-full shadow-md text-base hover:bg-[#145b44] transition-all duration-300">
               15+ Years of Experience
             </button>
           </motion.div>
@@ -63,11 +69,14 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="font-semibold text-[#0A4833]">Dr. Vasantha Manju</span> is a
-            renowned dermatologist and the founder of{" "}
-            <span className="font-semibold text-[#0A4833]">JK Skin Clinic</span> in Bhavani.
-            She is well known for her clinical expertise, compassionate approach, and
-            commitment to providing the highest quality of dermatological care.
+            <span className="font-semibold text-[#0A4833]">
+              Dr. M. Vasantha Manju
+            </span>{" "}
+            is a renowned dermatologist and the founder of{" "}
+            <span className="font-semibold text-[#0A4833]">JK Skin Clinic</span>{" "}
+            in Bhavani. She is well known for her clinical expertise,
+            compassionate approach, and commitment to providing the highest
+            quality of dermatological care.
           </motion.p>
 
           {/* Academic Qualification */}
@@ -77,13 +86,14 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-2">
+            <h3 className="text-xl font-semibold text-[#0A4833] mb-2">
               Academic Qualification
             </h3>
             <p className="text-[#0A4833] leading-relaxed">
-              She completed her MBBS at Coimbatore Medical College with laurels and went on
-              to obtain her Diploma in Dermatology from the esteemed Madras Medical College.
-              Her dedication and quick diagnosis have made her highly respected among peers.
+              She completed her MBBS at Coimbatore Medical College with laurels
+              and went on to obtain her Diploma in Dermatology from the esteemed
+              Madras Medical College. Her dedication and quick diagnosis have
+              made her highly respected among peers.
             </p>
           </motion.div>
 
@@ -94,13 +104,14 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-2">
+            <h3 className="text-xl font-semibold text-[#0A4833] mb-2">
               Training & Expertise
             </h3>
             <p className="text-[#0A4833] leading-relaxed">
-              Trained in all kinds of aesthetic and laser procedures, she consistently updates
-              her knowledge by attending national and international conferences to stay at the
-              forefront of modern dermatology.
+              Trained in all kinds of aesthetic and laser procedures, she
+              consistently updates her knowledge by attending national and
+              international conferences to stay at the forefront of modern
+              dermatology.
             </p>
           </motion.div>
 
@@ -111,11 +122,12 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-3">
+            <h3 className="text-xl font-semibold text-[#0A4833] mb-3">
               Honours & Presentations
             </h3>
             <p className="text-[#0A4833] mb-3 leading-relaxed">
-              She has been invited to various CMEs as a speaker to address the crowd on topics like:
+              She has been invited to various CMEs as a speaker to address the
+              crowd on topics like:
             </p>
             <ul className="list-decimal ml-6 text-[#0A4833] leading-relaxed space-y-1">
               <li>Diet in Dermatology</li>
@@ -133,12 +145,12 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-2">
+            <h3 className="text-xl font-semibold text-[#0A4833] mb-2">
               Special Interest
             </h3>
             <p className="text-[#0A4833] leading-relaxed">
-              PRP / GFC therapy is her special area of interest, where she has achieved
-              outstanding results and patient satisfaction.
+              PRP / GFC therapy is her special area of interest, where she has
+              achieved outstanding results and patient satisfaction.
             </p>
           </motion.div>
 
@@ -148,17 +160,18 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-2xl font-semibold text-[#0A4833] mb-3">
+            <h3 className="text-xl font-semibold text-[#0A4833] mb-3">
               Professional Memberships
             </h3>
             <ul className="list-disc ml-6 text-[#0A4833] leading-relaxed space-y-1">
               <li>Member of Tamilnadu Medical Council.</li>
               <li>
-                Life member of the Indian Association of Dermatology, Venereology and
-                Leprosy.
+                Life member of the Indian Association of Dermatology,
+                Venereology and Leprosy.
               </li>
               <li>
-                Life member of the Indian Association of Sexually Transmitted Diseases.
+                Life member of the Indian Association of Sexually Transmitted
+                Diseases.
               </li>
               <li>Life member of Cutaneous Surgeons of India.</li>
             </ul>

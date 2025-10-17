@@ -15,6 +15,7 @@ import Login from "./Components/Login";
 import Dashboard from "./Components/Dashboared";
 import Blogs from "./Components/Blogs";
 import Announcements from "./Components/Announcements";
+import AestheticProcedures from "./Components/AstheticProcedures";
 
 export default function App() {
   return (
@@ -26,10 +27,11 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/treatments" element={<Treatments />} />
+           <Route path="/procedures" element={<AestheticProcedures />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/contact" element={<Contact />} />
-
+          
           {/* Admin Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />

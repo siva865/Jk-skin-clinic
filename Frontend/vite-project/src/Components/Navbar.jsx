@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { HiMenu } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/Images/logo.jpeg"; // make sure your logo path is correct
+import logo from "../assets/Images/logo.jpeg"; // ensure your logo path is correct
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -21,6 +21,7 @@ export default function Navbar() {
     : [
         { to: "/", label: "Home" },
         { to: "/about", label: "About" },
+        { to: "/procedures", label: "Procedures" },
         { to: "/treatments", label: "Treatments" },
         { to: "/blogs", label: "Blogs" },
         { to: "/testimonials", label: "Testimonials" },
@@ -35,20 +36,37 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between">
-        {/* Logo */}
-        <Link to={token ? "/dashboard" : "/"} className="flex   gap-3">
-          <img src={logo} alt="Logo" className="w-15 h-12 object-contain " />
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        {/* ---------- Logo + Clinic + Doctor Name ---------- */}
+        <Link
+          to={token ? "/dashboard" : "/"}
+          className="flex items-center gap-3"
+        >
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-12 h-12 object-contain rounded-full border border-[#0A4833]"
+          />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-semibold text-[#0A4833] tracking-wide">
+              JK Skin Clinic
+            </h1>
+            <span className="text-sm text-[#0A4833] font-medium">
+              Dr. M Vasanthamanju
+            </span>
+          </div>
         </Link>
 
-        {/* Desktop Navbar */}
+        {/* ---------- Desktop Navbar ---------- */}
         <nav className="hidden lg:flex items-center gap-6">
           {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `relative text-lg font-medium transition-colors duration-300 text-[#0A4833] hover:text-[#F6D3A6]`
+                `relative text-lg font-medium transition-colors duration-300 ${
+                  isActive ? "text-[#F6D3A6]" : "text-[#0A4833]"
+                } hover:text-[#F6D3A6]`
               }
             >
               {link.label}
@@ -72,7 +90,7 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* Mobile Hamburger */}
+        {/* ---------- Mobile Hamburger ---------- */}
         <button
           className="lg:hidden"
           onClick={() => setOpen(true)}
@@ -82,7 +100,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ---------- Mobile Menu ---------- */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -98,6 +116,7 @@ export default function Navbar() {
               exit={{ x: -300 }}
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
             >
+              {/* Close Button */}
               <button
                 onClick={() => setOpen(false)}
                 className="absolute top-6 right-6"
@@ -105,20 +124,42 @@ export default function Navbar() {
               >
                 <IoClose size={26} className="text-[#0A4833]" />
               </button>
-              <ul className="flex flex-col gap-6 mt-12">
+
+              {/* Mobile Logo + Name */}
+              <div className="flex flex-col items-start gap-1 mb-8">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={logo}
+                    alt="Logo"
+                    className="w-10 h-10 object-contain rounded-full border border-[#0A4833]"
+                  />
+                  <h1 className="text-xl font-semibold text-[#0A4833]">
+                    JK Skin Clinic
+                  </h1>
+                </div>
+                <span className="text-sm text-[#0A4833] font-medium ml-13">
+                  Dr. M Vasanthamanju
+                </span>
+              </div>
+
+              {/* Mobile Links */}
+              <ul className="flex flex-col gap-6 mt-4">
                 {links.map((link) => (
                   <li key={link.to}>
                     <NavLink
                       onClick={() => setOpen(false)}
                       to={link.to}
                       className={({ isActive }) =>
-                        `text-2xl font-semibold transition-colors duration-300 text-[#0A4833] hover:text-[#F6D3A6]`
+                        `text-2xl font-semibold transition-colors duration-300 ${
+                          isActive ? "text-[#F6D3A6]" : "text-[#0A4833]"
+                        } hover:text-[#F6D3A6]`
                       }
                     >
                       {link.label}
                     </NavLink>
                   </li>
                 ))}
+
                 {!token ? (
                   <li>
                     <button

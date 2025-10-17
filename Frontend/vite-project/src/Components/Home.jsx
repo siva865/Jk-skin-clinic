@@ -35,7 +35,6 @@ export default function Home() {
     <section
       className="min-h-[90vh] flex flex-col justify-center items-center text-center px-6 relative"
       style={{
-        // ✅ Cloudinary hosted background (deploy-safe)
         backgroundImage: `url("https://res.cloudinary.com/dmptpis3d/image/upload/v1760603817/L_DSC_4512_1_kqlbzx.jpg")`,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -62,14 +61,20 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2
-            className="text-3xl md:text-5xl font-bold text-white tracking-wide mb-4"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="text-[#0A4833] font-semibold">JK Skin Clinic</span>
-          </motion.h2>
+          {/* Clinic Name */}
+         {/* Clinic Name */}
+<motion.h2
+  className="text-5xl md:text-6xl font-extrabold mb-4 tracking-wide"
+  initial={{ opacity: 0, y: -30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  style={{
+    color: "#BA0D4D", // direct color applied
+  }}
+>
+  JK Skin Clinic
+</motion.h2>
+
 
           <motion.h1
             className="text-4xl md:text-6xl font-serif text-[#0A4833] mb-4 leading-tight"
@@ -88,8 +93,15 @@ export default function Home() {
           >
             Experience luxury skincare treatments designed to bring out your
             natural glow. At{" "}
-            <span className="font-semibold text-[#0A4833]">JK Skin Clinic</span>,
-            science meets elegance to help you feel confident in your skin.
+            <span
+              className="font-extrabold text-transparent bg-clip-text"
+              style={{
+                color:"#0A4833"
+              }}
+            >
+              JK Skin Clinic
+            </span>
+            , science meets elegance to help you feel confident in your skin.
           </motion.p>
 
           <motion.button
