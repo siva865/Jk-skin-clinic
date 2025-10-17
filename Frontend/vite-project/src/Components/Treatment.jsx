@@ -29,7 +29,7 @@ export default function MedicalTreatments() {
 
   return (
     <motion.div
-      className="bg-[#0A4833] rounded-2xl p-8 mb-12 shadow-lg"
+      className="bg-[#0A4833] rounded-2xl p-8 mb-12 shadow-lg "
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
@@ -53,9 +53,7 @@ export default function MedicalTreatments() {
             <h4 className="text-lg font-semibold text-[#0A4833] mb-2">
               {item.title}
             </h4>
-            <p className="text-sm text-[#0A4833]/80 mb-3">
-              Expert care designed to treat {item.title.toLowerCase()}.
-            </p>
+           
 
             {isMobile && (
               <button

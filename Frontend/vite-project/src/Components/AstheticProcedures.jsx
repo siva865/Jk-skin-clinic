@@ -82,9 +82,6 @@ export default function AestheticProcedures() {
               <h4 className="text-lg font-semibold text-[#0A4833] mb-2">
                 {procedure.title}
               </h4>
-              <p className="text-sm text-[#0A4833]/80 mb-3">
-                Enhance your beauty with {procedure.title.toLowerCase()}.
-              </p>
 
               {isMobile && (
                 <button
